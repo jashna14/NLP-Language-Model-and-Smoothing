@@ -116,7 +116,7 @@ def bigram_k(unigrams , bigrams , sentence):
 		length = length - 1
 
 		for x in range(length):
-			if words[x] in unigrams:(unigrams[words[x+1]]/(sum(unigrams.values()) + len(unigrams)))
+			if words[x] in unigrams:
 				if words[x+1] in bigrams[words[x]]:
 					prob1 = float(max(bigrams[words[x]][words[x+1]] - d , 0))/float(unigrams[words[x]])
 				else:
@@ -244,9 +244,8 @@ def unigram_w(unigrams,sentence):
 			if words[x] in unigrams:
 				prob1 = unigrams[words[x]]/(sum(unigrams.values())+ len(unigrams))
 			else:
-				lam = (float(0.75)/float(sum(unigrams.values())))*len(unigrams)
+				lam = (float(0.5)/float(sum(unigrams.values())))*len(unigrams)
 				prob1 = lam/len(unigrams)
-			# print(prob1)
 
 			prob = prob*prob1
 
@@ -279,9 +278,7 @@ def bigram_w(unigrams , bigrams , sentence):
 				else:
 					cnt1 = len(unigrams) - len(bigrams[words[x]])
 					prob1 = len(bigrams[words[x]])/(cnt1*(unigrams[words[x]] + len(bigrams[words[x]])))		
-				print(lam , prob1 , (unigrams[words[x+1]]/(sum(unigrams.values()) + len(unigrams))))
 				prob1 = prob1*lam + (1 - lam)*(unigrams[words[x+1]]/(sum(unigrams.values()) + len(unigrams)))
-				print(prob1)
 			else:
 				lam = (float(0.75)/float(sum(unigrams.values())))*len(unigrams)
 				cnt = 0
@@ -325,7 +322,7 @@ def trigram_w(unigrams , bigrams , trigrams, sentence):
 				prob1 = prob1*lam + (1 - lam)*bigram_w(unigrams , bigrams , new_sen)
 
 			else:
-				lam = (float(0.75)/float(sum(unigrams.values())))*len(unigrams)
+				lam = (float(7)/float(sum(unigrams.values())))*len(unigrams)
 				cnt = 0
 				for i in trigrams:
 					for j in trigrams[i]:
@@ -335,9 +332,6 @@ def trigram_w(unigrams , bigrams , trigrams, sentence):
 			prob = prob*prob1
 
 	return prob
-
-
-
 
 
 model_type = sys.argv[1]
@@ -351,39 +345,49 @@ unigrams = unigrams_get(f)
 bigrams = bigrams_get(f1)
 trigrams = trigrams_get(f2)
 
-# print(unigrams)
-# print()
-# print()
-# print(bigrams)
-# cnt1 =0
-# for i in bigrams:
-# 	cnt1 += len(bigrams[i])
-# print(cnt1)	
-# print(float(5)/float(70))
 
 while 1:
 	sen = input("Input Sentence :")
 
-	if model_type == '2' and smoothing_type == 'k':
-		prob = bigram_k(unigrams , bigrams , sen)
-		print(prob)
+	# if model_type == '2' and smoothing_type == 'k':
+	# 	prob = bigram_k(unigrams , bigrams , sen)
+	# 	print(prob)
 
-	if model_type == '3' and smoothing_type == 'k':
-		prob = trigram_k(unigrams , bigrams , trigrams , sen)
-		print(prob)
+	# if model_type == '3' and smoothing_type == 'k':
+	# 	prob = trigram_k(unigrams , bigrams , trigrams , sen)
+	# 	print(prob)
 
-	if model_type == '1' and smoothing_type == 'k':
-		prob = unigram_k(unigrams , sen)
-		print(prob)
+	# if model_type == '1' and smoothing_type == 'k':
+	# 	prob = unigram_k(unigrams , sen)
+	# 	print(prob)
 
-	if model_type == '2' and smoothing_type == 'w':
-		prob = bigram_w(unigrams , bigrams , sen)
-		print(prob)
+	# if model_type == '2' and smoothing_type == 'w':
+	# 	prob = bigram_w(unigrams , bigrams , sen)
+	# 	print(prob)
 
-	if model_type == '3' and smoothing_type == 'w':
-		prob = trigram_w(unigrams , bigrams , trigrams , sen)
-		print(prob)
+	# if model_type == '3' and smoothing_type == 'w':
+	# 	prob = trigram_w(unigrams , bigrams , trigrams , sen)
+	# 	print(prob)
 
-	if model_type == '1' and smoothing_type == 'w':
-		prob = unigram_w(unigrams , sen)
-		print(prob)				
+	# if model_type == '1' and smoothing_type == 'w':
+	# 	prob = unigram_w(unigrams , sen)
+	# 	print(prob)
+
+	prob = unigram_k(unigrams , sen)
+	print(prob)	
+
+	prob = bigram_k(unigrams , bigrams , sen)
+	print(prob)	
+
+	prob = trigram_k(unigrams ,bigrams ,trigrams ,sen)
+	print(prob)
+	
+	prob = unigram_w(unigrams , sen)
+	print(prob)	
+
+	prob = bigram_w(unigrams , bigrams , sen)
+	print(prob)	
+
+	prob = trigram_w(unigrams , bigrams , trigrams ,sen)
+	print(prob)
+	
