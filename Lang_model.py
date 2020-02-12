@@ -66,7 +66,7 @@ def bigrams_get(f):
 	return bigrams
 
 def unigram_k(unigrams , sentence):
-	d = 0.75
+	d = 0.5
 	prob = 0
 
 	if sentence.strip():
@@ -102,7 +102,7 @@ def unigram_k(unigrams , sentence):
 	return prob
 
 def bigram_k(unigrams , bigrams , sentence):
-	d = 0.5
+	d = 0.75
 	prob = 0
 
 	if sentence.strip():
@@ -114,9 +114,9 @@ def bigram_k(unigrams , bigrams , sentence):
 		words = nltk.word_tokenize(sentence)
 		length = len(words)
 		length = length - 1
-		prob *= unigram_k(unigrams , words[0]) 
+
 		for x in range(length):
-			if words[x] in unigrams:
+			if words[x] in unigrams:(unigrams[words[x+1]]/(sum(unigrams.values()) + len(unigrams)))
 				if words[x+1] in bigrams[words[x]]:
 					prob1 = float(max(bigrams[words[x]][words[x+1]] - d , 0))/float(unigrams[words[x]])
 				else:
@@ -157,7 +157,7 @@ def bigram_k(unigrams , bigrams , sentence):
 	return prob	
 
 def trigram_k(unigrams , bigrams , trigrams , sentence):
-	d = 0.75
+	d = 7
 	prob = 0
 
 	if sentence.strip():
@@ -169,9 +169,7 @@ def trigram_k(unigrams , bigrams , trigrams , sentence):
 		words = nltk.word_tokenize(sentence)
 		length = len(words)
 		length = length - 2
-		prob *= unigram_k(unigrams , words[0])
-		sen = words[0] + words[1] 
-		prob *= bigram_k(unigrams , bigrams , sen)
+
 		for x in range(length):
 			if words[x] in unigrams and words[x+1] in unigrams and words[x+1] in bigrams[words[x]]:
 				if words[x+2] in trigrams[words[x]][words[x+1]]:
@@ -248,6 +246,7 @@ def unigram_w(unigrams,sentence):
 			else:
 				lam = (float(0.75)/float(sum(unigrams.values())))*len(unigrams)
 				prob1 = lam/len(unigrams)
+			# print(prob1)
 
 			prob = prob*prob1
 
@@ -266,7 +265,6 @@ def bigram_w(unigrams , bigrams , sentence):
 		words = nltk.word_tokenize(sentence)
 		length = len(words)
 		length = length - 1
-		prob *= unigram_w(unigrams , words[0])
 
 		for x in range(length):
 			if words[x] in unigrams and words[x+1] in unigrams:
@@ -281,8 +279,9 @@ def bigram_w(unigrams , bigrams , sentence):
 				else:
 					cnt1 = len(unigrams) - len(bigrams[words[x]])
 					prob1 = len(bigrams[words[x]])/(cnt1*(unigrams[words[x]] + len(bigrams[words[x]])))		
+				print(lam , prob1 , (unigrams[words[x+1]]/(sum(unigrams.values()) + len(unigrams))))
 				prob1 = prob1*lam + (1 - lam)*(unigrams[words[x+1]]/(sum(unigrams.values()) + len(unigrams)))
-
+				print(prob1)
 			else:
 				lam = (float(0.75)/float(sum(unigrams.values())))*len(unigrams)
 				cnt = 0
@@ -307,9 +306,7 @@ def trigram_w(unigrams , bigrams , trigrams, sentence):
 		words = nltk.word_tokenize(sentence)
 		length = len(words)
 		length = length - 2
-		prob *= unigram_w(unigrams , words[0])
-		sen = words[0] + words[1] 
-		prob *= bigram_w(unigrams , bigrams , sen)
+
 		for x in range(length):
 			if words[x] in unigrams and words[x+1] in unigrams and words[x+1] in bigrams[words[x]]:	
 				cnt1 = 0
