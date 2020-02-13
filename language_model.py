@@ -1,6 +1,7 @@
 import sys
 import re
 import nltk
+import math
 from nltk.tokenize import sent_tokenize, word_tokenize
 
 def unigrams_get(f):
@@ -70,7 +71,7 @@ def unigram_k(unigrams , sentence):
 	prob = 0
 
 	if sentence.strip():
-		prob = 1
+		# prob = 1
 		sentence = re.sub('-+', ' ',sentence)
 		sentence = re.sub('[^a-zA-Z ]+', "",sentence)
 		sentence = re.sub(' +', ' ',sentence)
@@ -97,7 +98,7 @@ def unigram_k(unigrams , sentence):
 			lam = (float(d)/float(cnt2))*cnt1
 			V = cnt1
 			prob1 = prob1 + lam/V
-			prob *= prob1
+			prob += math.log(prob1)
 
 	return prob
 
@@ -106,7 +107,7 @@ def bigram_k(unigrams , bigrams , sentence):
 	prob = 0
 
 	if sentence.strip():
-		prob = 1
+		# prob = 1
 		sentence = re.sub('-+', ' ',sentence)
 		sentence = re.sub('[^a-zA-Z ]+', "",sentence)
 		sentence = re.sub(' +', ' ',sentence)
@@ -152,7 +153,7 @@ def bigram_k(unigrams , bigrams , sentence):
 					cnt += len(bigrams[i])
 				prob1 = lam/cnt 	
 
-			prob *= prob1
+			prob += math.log(prob1)
 
 	return prob	
 
@@ -161,7 +162,7 @@ def trigram_k(unigrams , bigrams , trigrams , sentence):
 	prob = 0
 
 	if sentence.strip():
-		prob = 1
+		# prob = 1
 		sentence = re.sub('-+', ' ',sentence)
 		sentence = re.sub('[^a-zA-Z ]+', "",sentence)
 		sentence = re.sub(' +', ' ',sentence)
@@ -224,7 +225,7 @@ def trigram_k(unigrams , bigrams , trigrams , sentence):
 						cnt += len(trigrams[i][j])
 				prob1 = lam/cnt 	
 
-			prob *= prob1
+			prob += math.log(prob1)
 			
 
 	return prob	 	 	
@@ -233,7 +234,7 @@ def trigram_k(unigrams , bigrams , trigrams , sentence):
 
 def unigram_w(unigrams,sentence):
 	if sentence.strip():
-		prob = 1
+		prob = 0
 		sentence = re.sub('-+', ' ',sentence)
 		sentence = re.sub('[^a-zA-Z ]+', "",sentence)
 		sentence = re.sub(' +', ' ',sentence)
@@ -247,7 +248,7 @@ def unigram_w(unigrams,sentence):
 				lam = (float(0.5)/float(sum(unigrams.values())))*len(unigrams)
 				prob1 = lam/len(unigrams)
 
-			prob = prob*prob1
+			prob = prob + math.log(prob1)
 
 	return prob				
 
@@ -256,7 +257,7 @@ def bigram_w(unigrams , bigrams , sentence):
 	prob = 0
 
 	if sentence.strip():
-		prob = 1
+		# prob = 1
 		sentence = re.sub('-+', ' ',sentence)
 		sentence = re.sub('[^a-zA-Z ]+', "",sentence)
 		sentence = re.sub(' +', ' ',sentence)
@@ -286,7 +287,7 @@ def bigram_w(unigrams , bigrams , sentence):
 					cnt += len(bigrams[i])
 				prob1 = lam/cnt
 
-			prob = prob*prob1
+			prob = prob + math.log(prob1)
 
 	return prob		
 
@@ -295,7 +296,7 @@ def trigram_w(unigrams , bigrams , trigrams, sentence):
 	prob = 0
 
 	if sentence.strip():
-		prob = 1
+		# prob = 1
 		sentence = re.sub('-+', ' ',sentence)
 		sentence = re.sub('[^a-zA-Z ]+', "",sentence)
 		sentence = re.sub(' +', ' ',sentence)
@@ -319,7 +320,7 @@ def trigram_w(unigrams , bigrams , trigrams, sentence):
 					prob1 = len(trigrams[words[x]][words[x+1]])/(cnt1*(bigrams[words[x]][words[x+1]] + len(trigrams[words[x]][words[x+1]])))
 				
 				new_sen = words[x+1] + " " + words[x+2]
-				prob1 = prob1*lam + (1 - lam)*bigram_w(unigrams , bigrams , new_sen)
+				prob1 = prob1*lam + (1 - lam)*math.exp(bigram_w(unigrams , bigrams , new_sen))
 
 			else:
 				lam = (float(7)/float(sum(unigrams.values())))*len(unigrams)
@@ -329,7 +330,7 @@ def trigram_w(unigrams , bigrams , trigrams, sentence):
 						cnt += len(trigrams[i][j])
 				prob1 = lam/cnt
 
-			prob = prob*prob1
+			prob = prob + math.log(prob1)
 
 	return prob
 
@@ -349,45 +350,45 @@ trigrams = trigrams_get(f2)
 while 1:
 	sen = input("Input Sentence :")
 
-	# if model_type == '2' and smoothing_type == 'k':
-	# 	prob = bigram_k(unigrams , bigrams , sen)
-	# 	print(prob)
+	if model_type == '2' and smoothing_type == 'k':
+		prob = bigram_k(unigrams , bigrams , sen)
+		print(math.exp(prob))
 
-	# if model_type == '3' and smoothing_type == 'k':
-	# 	prob = trigram_k(unigrams , bigrams , trigrams , sen)
-	# 	print(prob)
+	if model_type == '3' and smoothing_type == 'k':
+		prob = trigram_k(unigrams , bigrams , trigrams , sen)
+		print(math.exp(prob))
 
-	# if model_type == '1' and smoothing_type == 'k':
-	# 	prob = unigram_k(unigrams , sen)
-	# 	print(prob)
+	if model_type == '1' and smoothing_type == 'k':
+		prob = unigram_k(unigrams , sen)
+		print(math.exp(prob))
 
-	# if model_type == '2' and smoothing_type == 'w':
-	# 	prob = bigram_w(unigrams , bigrams , sen)
-	# 	print(prob)
+	if model_type == '2' and smoothing_type == 'w':
+		prob = bigram_w(unigrams , bigrams , sen)
+		print(math.exp(prob))
 
-	# if model_type == '3' and smoothing_type == 'w':
-	# 	prob = trigram_w(unigrams , bigrams , trigrams , sen)
-	# 	print(prob)
+	if model_type == '3' and smoothing_type == 'w':
+		prob = trigram_w(unigrams , bigrams , trigrams , sen)
+		print(math.exp(prob))
 
-	# if model_type == '1' and smoothing_type == 'w':
-	# 	prob = unigram_w(unigrams , sen)
-	# 	print(prob)
+	if model_type == '1' and smoothing_type == 'w':
+		prob = unigram_w(unigrams , sen)
+		print(math.exp(prob))
 
-	prob = unigram_k(unigrams , sen)
-	print(prob)	
+	# prob = unigram_k(unigrams , sen)
+	# print(math.exp(prob))	
 
-	prob = bigram_k(unigrams , bigrams , sen)
-	print(prob)	
+	# prob = bigram_k(unigrams , bigrams , sen)
+	# print(math.exp(prob))	
 
-	prob = trigram_k(unigrams ,bigrams ,trigrams ,sen)
-	print(prob)
+	# prob = trigram_k(unigrams ,bigrams ,trigrams ,sen)
+	# print(math.exp(prob))
 	
-	prob = unigram_w(unigrams , sen)
-	print(prob)	
+	# prob = unigram_w(unigrams , sen)
+	# print(math.exp(prob))	
 
-	prob = bigram_w(unigrams , bigrams , sen)
-	print(prob)	
+	# prob = bigram_w(unigrams , bigrams , sen)
+	# print(math.exp(prob))	
 
-	prob = trigram_w(unigrams , bigrams , trigrams ,sen)
-	print(prob)
-	
+	# prob = trigram_w(unigrams , bigrams , trigrams ,sen)
+	# print(math.exp(prob))
+		
